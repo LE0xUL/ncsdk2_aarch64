@@ -3,7 +3,7 @@
 # Movidius Neural Compute Toolkit install utilities
 # This file contains functions only sourced by install.sh and uninstall.sh.
 # This script cannot be executed directly.
-# 
+#
 # Please provide feedback in our support forum if you encountered difficulties.
 ################################################################################
 # require this script to be sourced and not executed directly - requires executing script name, $0,
@@ -27,7 +27,7 @@ function error_report()
 }
 
 
-# set_error_handling - enable catching errors 
+# set_error_handling - enable catching errors
 function set_error_handling()
 {
     ### set error handling
@@ -53,10 +53,10 @@ function initialize_constants()
 
     # avoid conflicts with PYTHONPATH during install
     export PYTHONPATH=""
-    
+
     # File used to find install location in case install dir doesn't match INSTALL_DIR
     INSTALL_INFO_FILENAME=.ncsdk_install.info
-    # set colours 
+    # set colours
     RED='\e[31m'
     GREEN='\e[32m'
     YELLOW='\e[33m'
@@ -67,7 +67,7 @@ function initialize_constants()
 }
 
 
-# ask_sudo_permissions - 
+# ask_sudo_permissions -
 # Sets global variables: SUDO_PREFIX, PIP_PREFIX
 function ask_sudo_permissions()
 {
@@ -79,12 +79,12 @@ function ask_sudo_permissions()
         sudo -v
         # Keep-alive: update existing sudo time stamp if set, otherwise do nothing.
         while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
-    fi    
+    fi
 }
 
 
 # read_ncsdk_config - reads user configuration file, ncsdk.conf
-# Sets global variables: INSTALL_DIR, INSTALL_CAFFE, CAFFE_FLAVOR, CAFFE_USE_CUDA, 
+# Sets global variables: INSTALL_DIR, INSTALL_CAFFE, CAFFE_FLAVOR, CAFFE_USE_CUDA,
 #                        INSTALL_TENSORFLOW, INSTALL_TOOLKIT, PIP_SYSTEM_INSTALL, VERBOSE
 function read_ncsdk_config()
 {
@@ -95,7 +95,7 @@ function read_ncsdk_config()
         exit 1
     fi
 
-    ### Set default values in case not they are not set in ncsdk.conf 
+    ### Set default values in case not they are not set in ncsdk.conf
     #  Any or all of these can be overridden by adding to ncsdk.conf
     INSTALL_DIR=/opt/movidius
     INSTALL_CAFFE=yes
@@ -107,7 +107,7 @@ function read_ncsdk_config()
     USE_VIRTUALENV=no
 
 
-    ### set # jobs to make simultaneously, MAKE_NJOBS, defaults to 1. 
+    ### set # jobs to make simultaneously, MAKE_NJOBS, defaults to 1.
     MAKE_NJOBS=1
     # Use nproc if available, test using 'command'
     RC=0
@@ -123,9 +123,10 @@ function read_ncsdk_config()
             DISTRO="$(lsb_release -i 2>/dev/null | cut -f 2)"
             OS_DISTRO="${DISTRO:-INVALID}"
             [ "${OS_DISTRO,,}" = "raspbian" ] && MAKE_NJOBS=$((MAKE_NJOBS-1))
+            [ "${OS_DISTRO,,}" = "debian" ] && MAKE_NJOBS=$((MAKE_NJOBS-1))
         fi
     fi
-    
+
     ### check configuration file, and discard any malformed lines
     count=0
     mal_count=0
@@ -197,7 +198,7 @@ function find_previous_install()
             [ ! -d "${PREV_NCSDK_PATH}" ] && PREV_NCSDK_PATH="unknown"
         else
             PREV_NCSDK_PATH="unknown"
-        fi      
+        fi
         # verify ncs_bin_path is in $PREV_INSTALL_INFO & it's a valid directory, else set unknown
         RC=0
         grep 'ncs_bin_path' $PREV_INSTALL_INFO 2>/dev/null || RC=$?
@@ -225,7 +226,7 @@ function find_previous_install()
         else
             PREV_NCS_INC_PATH="unknown"
         fi
-        
+
         if [ "${VERBOSE}" = "yes" ] ; then
             echo "Previously installed NCSDK files are at: $PREV_NCSDK_PATH"
             echo "Previously installed NCSDK binaries are at: $PREV_NCS_BIN_PATH"
@@ -282,7 +283,7 @@ function check_and_remove_files()
 
 # check_and_remove_pip_pip3_pkg - removes pip2/pip3 package if installed
 #   argument 1 = pip package to check and remove
-#  
+#
 function check_and_remove_pip_pkg()
 {
     pip_pkg=$1
@@ -293,7 +294,7 @@ function check_and_remove_pip_pkg()
         if [ $RC -ne 0 ] ; then
             echo -e "${RED} Command PIP=${PIP} not found.  Will exit${NC}"
             exit 1
-        fi    
+        fi
         RC=0
         $PIP_PREFIX ${PIP} show ${pip_pkg} 1> /dev/null || RC=$?
         if [ $RC -eq 0 ]; then
@@ -343,16 +344,16 @@ function detect_and_move_ncsdk1()
         echo "projects using NCAPI v1 will no longer work unless you do one of the following:"
         echo "  - Manually update projects to use NCAPI v2."
         echo "  - Manually configure your projects to use the old NCAPI v1 files which will be"
-        echo "    moved to ${NCSDK1_ARCHIVE_DIR}:" 
+        echo "    moved to ${NCSDK1_ARCHIVE_DIR}:"
         echo ""
         read -p "Do you wish to continue installing Movidius Neural Compute Toolkit Installation (y/n) ? " CONTINUE
         echo -e "${NC}"
         if [[ "$CONTINUE" != "y" && "$CONTINUE" != "Y" ]]; then
             echo -e "${RED}Based on user input, not continuing with installation${NC}"
-            exit 1            
+            exit 1
         fi
 
-        # Prompt user if they want to remove old NCSDK API 1 directory 
+        # Prompt user if they want to remove old NCSDK API 1 directory
         if [ -d ${NCSDK1_ARCHIVE_DIR} ] ; then
             echo -e "${YELLOW}Warning: Detected an existing NCSDK 1.x directory at ${NCSDK1_ARCHIVE_DIR}"
             echo -e "You can exit and see if you want to delete this directory and re-run make install"
@@ -376,7 +377,7 @@ function detect_and_move_ncsdk1()
         [ -d ${SYS_INSTALL_DIR}/bin/ncsdk ] && ${SUDO_PREFIX} mv ${SYS_INSTALL_DIR}/bin/ncsdk ${NCSDK1_ARCHIVE_DIR}/bin
         # remove toolkit binaries old soft links
         check_and_remove_file ${SYS_INSTALL_DIR}/bin/mvNCCheck
-        check_and_remove_file ${SYS_INSTALL_DIR}/bin/mvNCCompile 
+        check_and_remove_file ${SYS_INSTALL_DIR}/bin/mvNCCompile
         check_and_remove_file ${SYS_INSTALL_DIR}/bin/mvNCProfile
         # Create new toolkit binaries soft links
         check_and_remove_file ${NCSDK1_ARCHIVE_DIR}/bin/mvNCCheck
@@ -386,7 +387,7 @@ function detect_and_move_ncsdk1()
         [ -f ${NCSDK1_ARCHIVE_DIR}/bin/ncsdk/mvNCCompile.py ] && $SUDO_PREFIX ln -s ${NCSDK1_ARCHIVE_DIR}/bin/ncsdk/mvNCCompile.py ${NCSDK1_ARCHIVE_DIR}/bin/mvNCCompile
         [ -f ${NCSDK1_ARCHIVE_DIR}/bin/ncsdk/mvNCProfile.py ] && $SUDO_PREFIX ln -s ${NCSDK1_ARCHIVE_DIR}/bin/ncsdk/mvNCProfile.py ${NCSDK1_ARCHIVE_DIR}/bin/mvNCProfile
 
-        ## Move NCSDK 1.x C/C++ API header file 
+        ## Move NCSDK 1.x C/C++ API header file
         [ -f ${SYS_INSTALL_DIR}/include/mvnc.h ] && $SUDO_PREFIX mv ${SYS_INSTALL_DIR}/include/mvnc.h ${NCSDK1_ARCHIVE_DIR}/include
 
         ## Move NCSDK 1.x C/C++ API lib - remove old soft links, move lib, create new soft link
@@ -422,7 +423,7 @@ function remove_previous_install()
         check_and_remove_tk_file mvNCCompile
         check_and_remove_tk_file ncsdk
     fi
-    
+
     # Remove libraries
     if [ "${PREV_NCS_LIB_PATH}" != "unknown" ] ; then
         [ "${VERBOSE}" = "yes" ] && printf "Searching and removing NCSDK libraries..."
@@ -432,7 +433,7 @@ function remove_previous_install()
         check_and_remove_files $PREV_NCS_LIB_PATH/mvnc
         [ "${VERBOSE}" = "yes" ] && printf "done\n"
     fi
-    
+
     # Remove include files
     if [ "${PREV_NCS_INC_PATH}" != "unknown" ] ; then
         [ "${VERBOSE}" = "yes" ] && printf "Searching and removing NCSDK include files..."
@@ -441,7 +442,7 @@ function remove_previous_install()
         check_and_remove_files $PREV_NCS_INC_PATH/mvnc2
         [ "${VERBOSE}" = "yes" ] && printf "done\n"
     fi
-    
+
     # Remove API, don't prompt user for a response
     [ "${VERBOSE}" = "yes" ] && printf "Searching and removing NCS python API..."
     # if pip2/3 are installed, attempt to remove mvnc.  If pip not installed then mvnc couldn't have been installed.
@@ -451,7 +452,7 @@ function remove_previous_install()
     command -v pip3 > /dev/null || RC_PIP3=$?
     [ ${RC_PIP2} -eq 0 ] && [ ${RC_PIP3} -eq 0 ] && check_and_remove_pip_pkg mvnc
     [ "${VERBOSE}" = "yes" ] && printf "done\n"
-    
+
     # Remove udev rules files
     [ "${VERBOSE}" = "yes" ] && printf "Searching and removing udev rules..."
     check_and_remove_file /etc/udev/rules.d/97-usbboot.rules
@@ -477,7 +478,7 @@ function remove_previous_install()
     if [ "${USE_VIRTUALENV}" == 'yes' ]; then
         check_and_remove_files ${INSTALL_DIR}/virtualenv-python
     fi
-    
+
     [ "${VERBOSE}" = "yes" ] && printf "Running ldconfig..."
     $SUDO_PREFIX ldconfig
     [ "${VERBOSE}" = "yes" ] && printf "done\n"
@@ -488,7 +489,7 @@ function remove_previous_install()
     if [ $RC -ne 0 ] ; then
         echo "Warning udevadm control --reload-rules return code = ${RC}"
     fi
-    RC=0 
+    RC=0
     $SUDO_PREFIX udevadm trigger || RC=$?
     if [ $RC -ne 0 ] ; then
         echo "Warning udevadm trigger reported an error return code = ${RC}"
@@ -500,10 +501,10 @@ function remove_previous_install()
 
     # remove install info file
     check_and_remove_files ${PREV_INSTALL_INFO}
-    
+
     ## remove version.txt and LICENSE
     check_and_remove_files ${INSTALL_DIR}/version.txt
     check_and_remove_files ${INSTALL_DIR}/LICENSE
-    
+
     echo "Successfully uninstalled NCSDK from the system"
 }
