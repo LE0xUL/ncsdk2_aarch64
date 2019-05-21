@@ -21,6 +21,13 @@ The provided Makefile helps with installation. Clone this repository and then ru
 cd ncsdk2_aarch64
 make install
 make api
+source ~/.bashrc
+make api
+```
+
+# Install Tensorflow (optional)
+```
+pip3 install tensorflow-1.11.0-cp35-none-linux_aarch64.whl
 ```
 
 # Examples
